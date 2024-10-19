@@ -1,0 +1,7 @@
+.formContainer {
+  margin-inline: auto;
+
+  @media screen and (min-width: 992px) {
+    margin-inline: 0;
+  }
+}
