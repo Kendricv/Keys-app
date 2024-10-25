@@ -1,19 +1,14 @@
-import { AreaChart } from 'recharts'
+import { getEntrancesAndExits } from '@/app/lib/actions';
+import Chart from './Chart';
+import { Flex, Title } from '@mantine/core';
 
-export default function EntrancesAndExitsChart() {
-  
+export default async function EntrancesAndExitsChart() {
+  const data = await getEntrancesAndExits();
 
   return (
-    <AreaChart
-      h={300}
-      data={data}
-      dataKey="date"
-      series={[
-        { name: 'Apples', color: 'indigo.6' },
-        { name: 'Oranges', color: 'blue.6' },
-        { name: 'Tomatoes', color: 'teal.6' },
-      ]}
-      curveType="linear"
-    />
-  )
+    <Flex direction={"column"} gap={"md"} w={"100%"}>
+      <Title order={2}>Últimos ingresos/salidas</Title>
+      <Chart data={data} />
+    </Flex>
+  );
 }

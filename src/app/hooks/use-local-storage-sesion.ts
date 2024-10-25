@@ -1,16 +1,16 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useSessionStore } from '../store/useSessionStore';
 
 export const useLocalStorageSession = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useSessionStore();
 
   useEffect(() => {
-    const userSession = localStorage.getItem('user-session') || '{}';
-    const userSessionJson = JSON.parse(userSession);
-    if (!userSessionJson.isLogged) {
+    if (!user) {
       router.push('/login');
-    } else if (userSessionJson.isLogged && pathname === '/') {
+    } else if (pathname === '/') {
       router.push('/dashboard');
     }
   }, [router]);

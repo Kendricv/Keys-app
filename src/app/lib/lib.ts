@@ -4,12 +4,16 @@ export interface SessionData {
   username: string;
   isLoggedIn: boolean;
   counter: number;
+  userId: string;
+  rol: string;
 }
 
 export const defaultSession: SessionData = {
   username: "",
   isLoggedIn: false,
   counter: 0,
+  userId: "",
+  rol: "",
 };
 
 export const sessionOptions: SessionOptions = {

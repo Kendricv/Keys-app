@@ -1,61 +1,40 @@
-'use client';
-import { AppShell, Box, Burger, Flex } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import Logo from '@/app/ui/logo/logo';
-import Searcher from '@/app/ui/searcher/searcher';
-import DarkModeButton from '../ui/darkModeButton';
-import NavbarLinks from '../ui/navbarLinks';
-import AvatarButton from '../ui/AvatarButton';
-import { useLocalStorageSession } from '@/app/hooks/use-local-storage-sesion';
+import DashboardAppShell from '@/app/ui/Dashboard';
+import { getSession } from '../lib/loginActions';
+import { redirect } from 'next/navigation';
+import { UserType } from '../lib/userType';
+import { sql } from '@vercel/postgres';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  useLocalStorageSession();
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+
+  if (!session.isLoggedIn) {
+    redirect('/login');
+  }
+  if (session.rol === 'Residente') {
+    redirect('/agenda');
+  }
+
+  const user: UserType = {
+    user_id: session.userId,
+    full_name: session.username,
+    email: session.userId,
+    rol: session.rol,
+    dpi: '',
+    lastname: '',
+    tel: '',
+    username: '',
+  };
+
+  const usersResponse = await sql`SELECT usuario_id AS user_id, CONCAT(nombre, ' ', apellidos) AS full_name, 
+    correo as email, rol, identificacion as dpi, telefono AS tel,
+    nombre as username,
+    apellidos as lastname
+    FROM table_usuarios WHERE estado = 1;`;
+  const users = usersResponse.rows.map((row) => row as UserType);
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: 'sm',
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-      padding='md'>
-      <AppShell.Header>
-        <Flex align={'center'} justify={'space-between'} px={'md'} py={'sm'}>
-          <Flex align={'center'} gap={'md'}>
-            <Burger size='sm' onClick={toggleDesktop} visibleFrom='sm' />
-            <Burger size='sm' onClick={toggleMobile} hiddenFrom='sm' />
-            <Box visibleFrom='sm'>
-              <Logo />
-            </Box>
-          </Flex>
-          {/* <Flex visibleFrom='sm' align={'center'} gap={'md'}>
-            <Searcher />
-          </Flex> */}
-          <Flex align={'center'} gap={'md'}>
-            <DarkModeButton />
-            <AvatarButton />
-          </Flex>
-        </Flex>
-      </AppShell.Header>
-
-      <AppShell.Navbar p='md'>
-        <Flex direction={'column'} gap={'xl'}>
-          <Box hiddenFrom='sm'>
-            <Logo />
-          </Box>
-          <Flex align={'center'} gap={'md'} w={'100%'}>
-            <Box hiddenFrom='sm'>
-              <Searcher />
-            </Box>
-            <NavbarLinks />
-          </Flex>
-        </Flex>
-      </AppShell.Navbar>
-
-      <AppShell.Main>{children}</AppShell.Main>
-    </AppShell>
+    <DashboardAppShell session={user} users={users}>
+      {children}
+    </DashboardAppShell>
   );
 }

@@ -3,11 +3,15 @@
 import '@mantine/core/styles.css';
 import './ui/globals.css';
 import '@mantine/charts/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/core/styles.layer.css';
+import 'mantine-datatable/styles.layer.css';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 
 export const metadata = {
-  title: 'My Mantine app',
+  title: 'Keys app',
   description: 'I have followed setup instructions carefully',
 };
 
